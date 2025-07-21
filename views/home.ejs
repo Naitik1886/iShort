@@ -563,7 +563,7 @@
       <div class="url-form">
         <% if (locals.id) { %>
           <div class="success-banner">
-            <h3>Short URL generated: <a <a href="<%= locals.baseUrl || 'http://localhost:8001' %>/<%= id %>" class="short-url"><%= locals.baseUrl || 'http://localhost:8001' %>/<%= id %></a></h3>
+            <h3>Short URL generated: <a  href="<%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= id %>" class="short-url"><%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= id %></a></h3>
           </div>
         <% } %>
 
@@ -611,7 +611,7 @@
                     <td><%= index + 1 %></td>
                     <td><%= urls.shortID %></td>
                     <td><%= urls.mainUrl %></td>
-                    <td><a href="<%= locals.baseUrl || 'http://localhost:8001' %>/<%= urls.shortID %>" class="short-url"><%= locals.baseUrl || 'http://localhost:8001' %>/<%= urls.shortID %></a></td>
+                    <td><a href="<%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= urls.shortID %>" class="short-url"><%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= urls.shortID %></a></td>
                   </tr>
                 <% }) %>
               </tbody>

@@ -9,9 +9,9 @@ router.get("/", isLoggedIn, async (req, res) => {
      const userData = await User.findById(req.user.userId);
   
   const allUrls = await Url.find({ createdBy: req.user.userId });
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  const baseUrl =  `${req.protocol}://${req.get('host')}`;
 
-  return res.render("home", { allUrls , baseUrl:process.env.BASE_URL,user : userData});
+  return res.render("home", { allUrls , baseUrl:baseUrl,user : userData});
 });
 
 router.get("/signup", (req, res) => {                
