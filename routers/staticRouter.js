@@ -30,7 +30,7 @@ router.get("/logout", (req, res) => {
  router.get("/:shortID", async (req, res) => {
   const shortID = req.params.shortID;
   const entry = await Url.findOne({ shortID: shortID });
-  return res.render(entry.mainUrl);
+  return res.redirect(entry.mainUrl);
 })
 
 module.exports = router;
