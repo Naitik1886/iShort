@@ -7,7 +7,7 @@ const secret = process.env.JWT_SECRET
 async function handleUserSignUp(req, res) {
   const { firstName, lastName , email, password } = req.body;
   const user = await User.findOne({ email });
-  if (user) return res.status(500).send("user already exists, Plz Login");
+  if (user) return res.redirect("/")
   bcrypt.genSalt(10, function (err, salt) {
     bcrypt.hash(password, salt, async function (err, hash) {
      const createdUser =  await User.create({
