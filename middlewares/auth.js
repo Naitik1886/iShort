@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const secret = process.env.JWT_SECRET
 
 function isLoggedIn(req, res, next) {
   // Check if token exists and is not empty
@@ -6,7 +7,7 @@ function isLoggedIn(req, res, next) {
     return res.redirect("/login");
   } else {
     
-      const data = jwt.verify(req.cookies.token, "abcie");
+      const data = jwt.verify(req.cookies.token, secret);
       req.user = data;
       next();
     } 
