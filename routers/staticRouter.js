@@ -28,9 +28,19 @@ router.get("/logout", (req, res) => {
 });
 
  router.get("/:shortID", async (req, res) => {
-  const shortID = req.params.shortID;
-  const entry = await Url.findOne({ shortID: shortID });
-  return res.redirect(entry.mainUrl);
-})
+  try {
+    const shortID = req.params.shortID;
+    const entry = await Url.findOne({ shortID: shortID });
+    
+    if (!entry) {
+      return res.status(404).send('URL not found');
+    }
+    
+    return res.redirect(entry.mainUrl);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
+});
 
 module.exports = router;
