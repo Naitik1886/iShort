@@ -561,9 +561,12 @@
 
     <div class="main-container">
       <div class="url-form">
-        <% if (locals.id) { %>
+        <% if (locals.allUrls) { %>
           <div class="success-banner">
-            <h3>Short URL generated: <a  href="<%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= id %>" class="short-url"><%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= id %></a></h3>
+              <% allUrls.forEach(urls,index => { %>
+                <h3>Short URL generated: <a  href="<%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= id %>" class="short-url"><%= locals.baseUrl || `http://localhost:${process.env.PORT}` %>/<%= id %></a></h3>
+              <% }) %>
+           
           </div>
         <% } %>
 
