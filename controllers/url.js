@@ -4,6 +4,7 @@ const User = require("../models/user");
 
 async function handlePostUrl(req, res) {
        const userData = await User.findById(req.user.userId);
+       const baseUrl =  `${req.protocol}://${req.get('host')}`;
 
   const shortID = shortid.generate();
   const { url } = req.body;
@@ -16,7 +17,7 @@ async function handlePostUrl(req, res) {
     
   });
 
-  return res.render("home", { id: shortID,user:userData });
+  return res.render("home", { id: shortID,user:userData , baseUrl:baseUrl });
 }
 
 
