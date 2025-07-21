@@ -1,0 +1,624 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shortener</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #0a0a0a;
+        min-height: 100vh;
+        padding: 20px;
+        color: #ffffff;
+      }
+
+      /* Simple subtle background */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 80%, rgba(128, 0, 255, 0.1) 0%, transparent 50%);
+        z-index: -1;
+      }
+
+      a {
+        color: #00f5ff;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      a:hover {
+        color: #40e0d0;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 20px 0;
+        position: relative;
+      }
+
+      .nav-buttons {
+        position: absolute;
+        top: -10px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        height: 0;
+      }
+
+      .logout-btn {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: inherit;
+        margin-left: auto; /* Push to the right */
+      }
+
+      .logout-btn:hover {
+        background: rgba(255, 69, 58, 0.2);
+        border-color: rgba(255, 69, 58, 0.4);
+        color: #ff453a;
+      }
+
+      .welcome-message {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 245, 255, 0.1);
+        border: 1px solid rgba(0, 245, 255, 0.2);
+        border-radius: 8px;
+        padding: 12px 16px; /* Increased padding */
+        text-align: left;
+        font-size: 1rem; /* Increased from 0.85rem */
+        color: #888;
+      }
+
+      .welcome-message .greeting {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Increased gap */
+      }
+
+      .user-name {
+        background: linear-gradient(135deg, #00f5ff 0%, #8000ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 600;
+        font-size: 1.1rem; /* Made name slightly larger */
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #00f5ff 0%, #0080ff 50%, #8000ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+        letter-spacing: -1px;
+      }
+
+      .subtitle {
+        color: #888;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-top: 10px;
+      }
+
+      .main-container {
+        max-width: 900px;
+        margin: 0 auto;
+        display: grid;
+        gap: 30px;
+      }
+
+      .url-form {
+        background: rgba(26, 26, 26, 0.8);
+        border: 1px solid #333;
+        border-radius: 16px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .success-banner {
+        background: rgba(13, 79, 60, 0.8);
+        border: 1px solid #166534;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .success-banner::before {
+        content: '✓';
+        font-size: 1.2rem;
+        color: #22c55e;
+        font-weight: bold;
+      }
+
+      .success-banner h3 {
+        color: #dcfce7;
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+
+      .success-banner a {
+        color: #ffd700;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-weight: 600;
+        word-break: break-all;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      label {
+        display: block;
+        color: #e5e5e5;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 16px 20px;
+        background: rgba(17, 17, 17, 0.8);
+        border: 2px solid #333;
+        border-radius: 10px;
+        color: #ffffff;
+        font-size: 16px;
+        font-family: 'SF Mono', Monaco, monospace;
+        transition: all 0.3s ease;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #00f5ff;
+        background: rgba(10, 10, 10, 0.9);
+        box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.1);
+      }
+
+      input[type="text"]::placeholder {
+        color: #666;
+      }
+
+      .generate-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #0080ff 0%, #8000ff 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .generate-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(0, 128, 255, 0.3);
+      }
+
+      .url-table-section {
+        background: rgba(17, 17, 17, 0.8);
+        border: 1px solid #222;
+        border-radius: 16px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .stats-info {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #888;
+        font-size: 0.9rem;
+      }
+
+      .stats-info .count {
+        color: #00f5ff;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+
+      .url-list {
+        display: grid;
+        gap: 15px;
+      }
+
+      .url-item {
+        background: rgba(10, 10, 10, 0.6);
+        border: 1px solid #222;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+      }
+
+      .url-item:hover {
+        border-color: #333;
+        background: rgba(26, 26, 26, 0.8);
+      }
+
+      .url-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .url-number {
+        background: rgba(0, 245, 255, 0.2);
+        color: #00f5ff;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        min-width: 35px;
+        text-align: center;
+      }
+
+      .short-id {
+        background: rgba(255, 215, 0, 0.2);
+        color: #ffd700;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 6px;
+      }
+
+      .original-url {
+        color: #ccc;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        word-break: break-all;
+        opacity: 0.8;
+      }
+
+      .short-url-link {
+        color: #ffd700;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 0.9rem;
+        font-weight: 600;
+        word-break: break-all;
+      }
+
+      .short-url-link:hover {
+        color: #ffed4e;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+      }
+
+      .empty-state .icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+
+      .empty-state h3 {
+        color: #888;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+      }
+
+      .empty-state p {
+        font-size: 0.9rem;
+      }
+
+      /* Stats bar styling */
+      .stats-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 15px 20px;
+        background: rgba(0, 245, 255, 0.05);
+        border: 1px solid rgba(0, 245, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .stat-value {
+        color: #00f5ff;
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+
+      .stat-label {
+        color: #888;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Table styling */
+      .table-wrapper {
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid #222;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(10, 10, 10, 0.6);
+      }
+
+      table th {
+        background: rgba(0, 245, 255, 0.1);
+        color: #00f5ff;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #333;
+      }
+
+      table td {
+        padding: 15px;
+        border-bottom: 1px solid #222;
+        color: #ccc;
+        font-size: 0.9rem;
+        vertical-align: top;
+      }
+
+      table tr:hover {
+        background: rgba(26, 26, 26, 0.8);
+      }
+
+      table td:first-child {
+        color: #00f5ff;
+        font-weight: 700;
+      }
+
+      table td:nth-child(2) {
+        color: #ffd700;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-weight: 600;
+      }
+
+      table td:nth-child(3) {
+        word-break: break-all;
+        max-width: 300px;
+      }
+
+      table .short-url {
+        color: #ffd700;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-weight: 600;
+      }
+
+      table .short-url:hover {
+        color: #ffed4e;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .nav-buttons {
+          position: static;
+          margin-bottom: 20px;
+          justify-content: space-between;
+          height: auto;
+          align-items: center;
+        }
+
+        .welcome-message {
+          position: static;
+          margin-bottom: 0;
+        }
+
+        .logout-btn {
+          padding: 10px 16px;
+          font-size: 13px;
+          margin-left: 0; /* Reset for mobile */
+        }
+
+        h1 {
+          font-size: 2.2rem;
+        }
+
+        .url-form, .url-table-section {
+          padding: 20px;
+        }
+
+        .url-header {
+          flex-wrap: wrap;
+        }
+
+        table, table thead, table tbody, table th, table td, table tr {
+          display: block;
+        }
+
+        table thead tr {
+          position: absolute;
+          top: -9999px;
+          left: -9999px;
+        }
+
+        table tr {
+          border: 1px solid #222;
+          margin-bottom: 10px;
+          border-radius: 8px;
+          padding: 15px;
+          background: rgba(10, 10, 10, 0.6);
+        }
+
+        table td {
+          border: none;
+          padding: 5px 0;
+          position: relative;
+          padding-left: 25%;
+        }
+
+        table td:before {
+          content: attr(data-label);
+          position: absolute;
+          left: 6px;
+          width: 20%;
+          padding-right: 10px;
+          white-space: nowrap;
+          color: #888;
+          font-weight: 600;
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 15px;
+        }
+
+        .nav-buttons {
+          flex-direction: column;
+          gap: 10px;
+          align-items: flex-start;
+        }
+
+        .logout-btn {
+          align-self: flex-end;
+        }
+
+        input[type="text"], .generate-btn {
+          padding: 14px 16px;
+          font-size: 15px;
+        }
+
+        .welcome-message {
+          font-size: 0.9rem;
+          padding: 10px 14px;
+        }
+
+        .user-name {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="nav-buttons">
+        <% if (locals.user) { %>
+          <div class="welcome-message">
+            <div class="greeting">
+              <span>Hi, <span class="user-name"><%= user.firstName %></span></span>
+              <span>👋</span>
+            </div>
+          </div>
+        <% } %>
+        <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+      
+      
+     
+      <h1><a href="/">URL Shortener</a></h1>
+      <p class="subtitle">Transform long URLs into short, shareable links</p>
+    </div>
+
+    <div class="main-container">
+      <div class="url-form">
+        <% if (locals.id) { %>
+          <div class="success-banner">
+            <h3>Short URL generated: <a <a href="<%= locals.baseUrl || 'http://localhost:8001' %>/<%= id %>" class="short-url"><%= locals.baseUrl || 'http://localhost:8001' %>/<%= id %></a></h3>
+          </div>
+        <% } %>
+
+        <form method="POST" action="/url">
+          <div class="form-group">
+            <label for="url">Original URL</label>
+            <input
+              type="text"
+              id="url"
+              name="url"
+              value="https://"
+              placeholder="https://www.example.com"
+              required
+            />
+          </div>
+          <button type="submit" class="generate-btn">Generate Short URL</button>
+        </form>
+      </div>
+
+      <% if (locals.allUrls && locals.allUrls.length > 0) { %>
+        <div class="url-table-section">
+          <div class="section-title">Your Shortened URLs</div>
+          
+          <div class="stats-bar">
+            <div class="stat-item">
+              <span class="stat-value"><%= locals.allUrls.length %></span>
+              <span class="stat-label">Total URLs</span>
+            </div>
+            
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Short ID</th>
+                  <th>Original URL</th>
+                  <th>Short URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% allUrls.forEach((urls, index) => { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= urls.shortID %></td>
+                    <td><%= urls.mainUrl %></td>
+                    <td><a href="<%= locals.baseUrl || 'http://localhost:8001' %>/<%= urls.shortID %>" class="short-url"><%= locals.baseUrl || 'http://localhost:8001' %>/<%= urls.shortID %></a></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </body>
+</html>
